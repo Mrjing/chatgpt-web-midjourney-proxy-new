@@ -45,6 +45,12 @@ COPY /service/pnpm-lock.yaml /app
 
 RUN pnpm install --production && rm -rf /root/.npm /root/.pnpm-store /usr/local/share/.cache /tmp/*
 
+ENV MJ_SERVER "https://jkcspace.zeabur.app/mj"
+
+ENV OPENAI_API_BASE_URL "https://api.openai.com"
+
+ENV OPENAI_API_KEY "sk-proj-LyITi26Hx7MUiaWTuosaT3BlbkFJbFfTad2OHY2bTC2c6rFW"
+
 COPY /service /app
 
 COPY --from=frontend /app/dist /app/public
