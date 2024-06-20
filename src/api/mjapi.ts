@@ -226,7 +226,22 @@ export const flechTask= ( chat:Chat.Chat)=>{
         chat.loading=   (cnt>=99)?false:true; 
         //chat.progress=ts.progress;
     
-        if(ts.progress && ts.progress== "100%") chat.loading=false;
+        if(ts.progress && ts.progress== "100%") {
+            chat.loading = false;
+            // 获取 discord图床链接
+            const sourceImgUrl = ts.imageUrl
+            // 换取 腾讯云链接
+            const urlRes = await fetch('/api/getCosUrl', {
+                body: JSON.stringify({
+                    sourceUrl: sourceImgUrl,
+                }),
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            chat.opt!.imageUrl = (await urlRes.json()).targetUrl
+        }
 
         homeStore.setMyData({act:'updateChat', actData:chat });
         //"NOT_START" //["SUBMITTED","IN_PROGRESS"].indexOf(ts.status)>-1

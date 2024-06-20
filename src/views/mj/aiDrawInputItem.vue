@@ -63,11 +63,20 @@ const isDisabled = computed(() => {
 })
 const ms=   useMessage();
 function create( ){
-
-
     st.value.isLoad=true
-    train( st.value.text.trim()).then(ps=>{
-        const rz={ prompt: st.value.text.trim() , drawText: createPrompt( ps) }
+    train( st.value.text.trim()).then(async (ps)=>{
+        console.log('st.value.text.trim()', st.value.text.trim())
+        console.log('ps', ps)
+        // TODO: 调用翻译API 中翻英
+        let finalText = ps;
+        try {
+            const translateRes = await fetch(`https://v.api.aa1.cn/api/api-fanyi-yd/index.php?type=1&msg=${ps}`)
+            const data = await translateRes.json()
+            finalText = data.text
+        }catch(e) {
+            console.log('翻译接口调用失败', e)
+        }
+        const rz = { prompt: finalText, drawText: createPrompt(finalText) }
         if( ps  ) drawSent(rz)
         st.value.text=''
         st.value.isLoad=false

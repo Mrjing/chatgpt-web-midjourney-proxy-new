@@ -227,6 +227,22 @@ const R2Client = () => {
   return s3;
 };
 
+app.post('/getCosUrl', async (req, res) => {
+  const sourceUrl = req.body.sourceUrl;
+  // 换取 腾讯云图床地址
+  const getCosRes = await axios.post('https://service-6eu2qcm2-1313504415.usw.tencentapigw.com/release/', {
+    sourceUrl: sourceUrl,
+  }, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })   
+  console.log('getCosRes', getCosRes.data )
+  res.json({
+    targetUrl: getCosRes.data
+  })
+})
+
 // cloudflare R2 upload
 app.post('/openapi/pre_signed', (req, res) => {
   const bucketName = process.env.R2_BUCKET_NAME;
