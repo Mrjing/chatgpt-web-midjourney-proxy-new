@@ -227,7 +227,7 @@ const R2Client = () => {
   return s3;
 };
 
-app.post('/getCosUrl', async (req, res) => {
+router.post('/getCosUrl', async (req, res) => {
   const sourceUrl = req.body.sourceUrl;
   // 换取 腾讯云图床地址
   const getCosRes = await axios.post('https://service-6eu2qcm2-1313504415.usw.tencentapigw.com/release/', {
