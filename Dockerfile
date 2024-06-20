@@ -47,9 +47,11 @@ RUN pnpm install --production && rm -rf /root/.npm /root/.pnpm-store /usr/local/
 
 ENV MJ_SERVER "https://jkcspace.zeabur.app/mj"
 
-ENV OPENAI_API_BASE_URL "https://api.openai.com"
+ENV OPENAI_API_BASE_URL "https://service-fu3ofeaa-1313504415.usw.tencentapigw.com"
 
-ENV OPENAI_API_KEY "sk-proj-LyITi26Hx7MUiaWTuosaT3BlbkFJbFfTad2OHY2bTC2c6rFW"
+ENV OPENAI_API_KEY "sk-proj-AWuXZbgtG9P1JQtGb1VbT3BlbkFJWJXUYVVBwUIG99MjyeCl"
+
+ENV SUNO_SERVER "http://43.143.18.178:8000"
 
 COPY /service /app
 
