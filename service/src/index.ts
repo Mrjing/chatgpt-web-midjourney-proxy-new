@@ -17,6 +17,7 @@ import FormData  from 'form-data'
 import axios from 'axios';
 import AWS  from 'aws-sdk';
 import { v4 as uuidv4} from 'uuid';
+import {MD5} from './utils/md5'
 
 
 const app = express()
@@ -240,6 +241,33 @@ router.post('/getCosUrl', async (req, res) => {
   console.log('getCosRes', getCosRes.data )
   res.json({
     targetUrl: getCosRes.data
+  })
+})
+
+// 百度翻译
+router.post('/translate', async (req, res) => {
+  const query = req.body.rawText;
+  let translateText = query
+  const salt = (new Date).getTime();
+  const from = 'zh';
+  const to = 'en';
+  const appId = process.env.BAIDU_TRANSLATE_APPID;
+  const key = process.env.BAIDU_TRANSLATE_API_KEY;
+  if (appId && key) {
+    const str1 = appId + query + salt + key;
+    const sign = MD5(str1);
+    const fetchUrl = 'http://api.fanyi.baidu.com/api/trans/vip/translate?q=' + encodeURI(query) + '&appid=' + process.env.BAIDU_TRANSLATE_APPID + '&salt=' + salt + '&from=' + from + '&to=' + to + '&sign=' + sign;
+    const fetchRes = await axios.get(fetchUrl)
+    console.log('fetchRes', fetchRes.data )
+    if(fetchRes.data.trans_result) {
+      res.json({
+        data: fetchRes.data.trans_result[0].dst
+      })
+      return
+    }
+  }
+  res.json({
+    data: translateText
   })
 })
 

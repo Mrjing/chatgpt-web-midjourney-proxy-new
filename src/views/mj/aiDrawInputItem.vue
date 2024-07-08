@@ -70,9 +70,17 @@ function create( ){
         // TODO: 调用翻译API 中翻英
         let finalText = ps;
         try {
-            const translateRes = await fetch(`https://v.api.aa1.cn/api/api-fanyi-yd/index.php?type=1&msg=${ps}`)
+            const translateRes = await fetch(`/api/translate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    rawText: ps
+                })
+            })
             const data = await translateRes.json()
-            finalText = data.text
+            finalText = data.data
         }catch(e) {
             console.log('翻译接口调用失败', e)
         }
