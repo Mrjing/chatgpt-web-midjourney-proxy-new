@@ -277,23 +277,30 @@ const selectFile3=  (input:any)=>{
     ms.loading('上传中...');
     upImg(input.target.files[0]).then( async(d)=>{
         mlog('selectFile3>> ',d );
-        let data={
-            action:'img2txt',
-            data:{
-                "base64Array":[d]
-            }
-        }
+        console.log('input,target.files', input.target.files)
+        const fileName = input.target.files[0].name;
         //homeStore.setMyData({act:'draw',actData:obj});
         //input.value.value='';
         try{
-            d=  await mjFetch('/mj/submit/upload-discord-images' , data.data  );
+            d = await fetch('/api/uploadFileToCos', {
+                body: JSON.stringify({
+                    fileBase64str: d,
+                    fileName: fileName
+                }),
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
             mlog('selectFile3>> ',d );
+            const fileUrl = (await d.json()).fileUrl
+            console.log('fileUrl', fileUrl)
             fsRef3.value.value='';
-            if(d.code== 1){
+            if (fileUrl){
                 if( st.value.upType=='cref'){
-                    f.value.cref= d.result[0];
+                    f.value.cref = fileUrl
                 }else{
-                    f.value.sref= d.result[0];
+                    f.value.sref = fileUrl;
                 }
                 ms.success( t('mj.uploadSuccess'));
             }
