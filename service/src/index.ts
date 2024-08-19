@@ -242,12 +242,14 @@ router.post('/uploadFileToCos', async (req, res) => {
   const fileName = req.body.fileName;
   console.log('fileBase64str', fileBase64str)
   console.log('fileName', fileName)
+  const fileBuffer = Buffer.from(fileBase64str.split(',')[1], 'base64');
+
   // 上传到腾讯云对象存储
   const uploadRes: any = await new Promise((resolve, reject) => cos.putObject({
     Bucket: 'cc-web-1313504415', /* 必须 */
     Region: 'ap-shanghai',    /* 必须 */
     Key: fileName,              /* 必须 */
-    Body: fileBase64str, // 上传文件对象
+    Body: fileBuffer, // 上传文件对象
     onProgress: function (progressData) {
       console.log(JSON.stringify(progressData));
     }
