@@ -18,10 +18,18 @@ import axios from 'axios';
 import AWS  from 'aws-sdk';
 import { v4 as uuidv4} from 'uuid';
 import {MD5} from './utils/md5'
+import COS from 'cos-nodejs-sdk-v5';
 
 
 const app = express()
 const router = express.Router()
+
+const cos = new COS({
+  UseAccelerate: true,
+  Protocol: 'https:',
+  SecretId: process.env.TENCENT_SECRET_ID, // 推荐使用环境变量获取；用户的 SecretId，建议使用子账号密钥，授权遵循最小权限指引，降低使用风险。子账号密钥获取可参考https://cloud.tencent.com/document/product/598/37140
+  SecretKey: process.env.TENCENT_SECRET_KEY, // 推荐使用环境变量获取；用户的 SecretKey，建议使用子账号密钥，授权遵循最小权限指引，降低使用风险。子账号密钥获取可参考https://cloud.tencent.com/document/product/598/37140
+});
 
 app.use(express.static('public' ,{
   // 设置响应头，允许带有查询参数的请求访问静态文件
@@ -227,6 +235,38 @@ const R2Client = () => {
   });
   return s3;
 };
+
+router.post('/uploadFileToCos', async (req, res) => {
+  // 获取文件base64及文件名
+  const fileBase64str = req.body.fileBase64str;
+  const fileName = req.body.fileName;
+  console.log('fileBase64str', fileBase64str)
+  console.log('fileName', fileName)
+  // 上传到腾讯云对象存储
+  const uploadRes: any = await new Promise((resolve, reject) => cos.putObject({
+    Bucket: 'cc-web-1313504415', /* 必须 */
+    Region: 'ap-shanghai',    /* 必须 */
+    Key: fileName,              /* 必须 */
+    Body: fileBase64str, // 上传文件对象
+    onProgress: function (progressData) {
+      console.log(JSON.stringify(progressData));
+    }
+  }, function (err, data) {
+    console.log(err || data);
+    if (data) {
+      // res.send(data.Location)
+      resolve(data)
+    }
+
+    if (err) {
+      reject(err)
+    }
+  }))
+  console.log('uploadRes', uploadRes)
+  res.json({
+    fileUrl: 'https://' + uploadRes.Location
+  })
+})
 
 router.post('/getCosUrl', async (req, res) => {
   const sourceUrl = req.body.sourceUrl;
